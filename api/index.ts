@@ -20,11 +20,13 @@ async function bootstrapServer() {
   return cachedServer;
 }
 
-export const handler: Handler = async (
-  event: any,
-  context: Context,
-  callback: Callback,
-) => {
-  cachedServer = await bootstrapServer();
-  return proxy(cachedServer, event, context, 'PROMISE').promise;
-};
+export const handler: Handler = async (event: any, context: Context, callback: Callback) => {
+    try {
+      cachedServer = await bootstrapServer();
+      return proxy(cachedServer, event, context, 'PROMISE').promise;
+    } catch (err) {
+      console.error('🔥 Serverless handler crash:', err);
+      throw err;
+    }
+  };
+  
